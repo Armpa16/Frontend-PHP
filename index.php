@@ -2,12 +2,13 @@
 session_start();
 
 // เชื่อมต่อฐานข้อมูล
-$servername = "localhost";
-$username = "root"; // 
-$password = "";     
-$dbname = "food_recommend_system";
+$servername = "yamabiko.proxy.rlwy.net";
+$port=13821;
+$username = "root";
+$password = "EKRiEnzCXzuGRzsXOanDuXnpFPvzKpOv";
+$dbname = "railway";
 
-$conn = new mysqli($servername, $username, $password, $dbname);
+$conn = new mysqli($servername, $username, $password, $dbname, $port);
 
 // ตรวจสอบการเชื่อมต่อ
 if ($conn->connect_error) {

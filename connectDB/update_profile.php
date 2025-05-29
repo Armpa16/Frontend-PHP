@@ -2,13 +2,14 @@
 session_start();
 header('Content-Type: application/json'); // ส่งข้อมูลเป็น JSON
 
-// --- การเชื่อมต่อฐานข้อมูล ---
-$servername = "localhost";
+// เชื่อมต่อฐานข้อมูล
+$servername = "yamabiko.proxy.rlwy.net";
+$port=13821;
 $username = "root";
-$password = "";
-$dbname = "food_recommend_system";
+$password = "EKRiEnzCXzuGRzsXOanDuXnpFPvzKpOv";
+$dbname = "railway";
 
-$conn = new mysqli($servername, $username, $password, $dbname);
+$conn = new mysqli($servername, $username, $password, $dbname, $port);
 
 // ตรวจสอบการเชื่อมต่อ
 if ($conn->connect_error) {

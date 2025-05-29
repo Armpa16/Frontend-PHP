@@ -1,11 +1,12 @@
 <?php
-// Database connection
-$servername = "localhost";
-$username = "root"; // Replace with your database username
-$password = "";     // Replace with your database password
-$dbname = "food_recommend_system";
+// เชื่อมต่อฐานข้อมูล
+$servername = "yamabiko.proxy.rlwy.net";
+$port=13821;
+$username = "root";
+$password = "EKRiEnzCXzuGRzsXOanDuXnpFPvzKpOv";
+$dbname = "railway";
 
-$conn = new mysqli($servername, $username, $password, $dbname);
+$conn = new mysqli($servername, $username, $password, $dbname, $port);
 
 // Check connection
 if ($conn->connect_error) {

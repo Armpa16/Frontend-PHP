@@ -1,18 +1,14 @@
 <?php
 
-/* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-$host = "localhost";
-$user = "root";
-$password = "";
-$database = "food_recommend_system";
+// เชื่อมต่อฐานข้อมูล
+$servername = "yamabiko.proxy.rlwy.net";
+$port=13821;
+$username = "root";
+$password = "EKRiEnzCXzuGRzsXOanDuXnpFPvzKpOv";
+$dbname = "railway";
 
-$link= new mysqli($host,$user,$password,$database);
-$conn=$link; 
-if (!$link) {
-    die('Could not connect: ' . mysql_error());
+$conn = new mysqli($servername, $username, $password, $dbname, $port);
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
 }
-//$link->query("set names utf8");
+?>

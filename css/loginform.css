@@ -1,0 +1,179 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    display: flex;
+}
+.box_left{
+    width: 50%;
+    height: 1024px;
+    display: flex;
+    justify-content: center;
+    align-items: center; 
+}
+.box_left form {
+    display: flex;
+    flex-direction: column; 
+    justify-content: center;
+    align-items: center; 
+}
+h1{
+    font-size: 35px;
+    font-weight: bold;
+    text-align: center;
+}
+input{
+    width: 410px;
+    height: 50px;
+    border-radius: 10px;
+    padding-left: 10px;
+}
+button{
+    width: 425px;
+    height: 55px;
+    border-radius: 8px;
+    background-color: #4A6BFF;
+    color: white;
+    font-size: 17px;
+    font-weight: bold;
+    align-items: center; 
+    cursor: pointer;
+}
+button:hover{
+    background-color: #3A5BFF;
+    color: white;
+}
+a{
+    width: 420px;
+    height: 50px;
+    border-radius: 8px;
+    font-weight: bold;
+    display: flex;
+    justify-content: center;
+    align-items: center; 
+    border: 2px solid #4A6BFF;
+    text-decoration: none;
+    color: #4A6BFF;
+}
+a:hover{
+    background-color: #4A6BFF;
+    color: white;
+}
+.regis{
+    display: flex;
+    color: #b7b7b7;
+}
+.regis hr{
+    width: 140px;
+    height: 0px;
+    border: 1px solid #C2C2C2;
+}
+.box_right{
+    width: 50%;
+    height: 1024px;
+    background-color: #4A6BFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.box_right h1{
+    color: white;
+    font-size: 50px;
+    font-weight: bold;
+    text-align: center;
+    letter-spacing: 6px;
+}
+.box_right p{
+    color: white;
+    font-size: 20px;
+    text-align: center;
+    margin-top: 10px;
+    line-height: 30px;
+    letter-spacing: 1.5px;
+}
+@media (max-width: 900px) {
+    body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start; /* Align to top */
+        min-height: 100vh;
+        padding-top: 20px; /* Add some padding at the top */
+    }
+
+    .box_left, .box_right {
+        width: 90% !important; /* Use !important to override existing styles if necessary */
+        margin: 10px 0;
+        height: auto; /* Adjust height automatically */
+        padding: 20px;
+    }
+
+    .box_left {
+        order: 2; /* Display login form below the welcome message on small screens */
+    }
+
+    .box_right {
+        order: 1;
+        text-align: center; /* Center text in the welcome box */
+        height: 300px;
+    }
+
+    .name {
+        margin-top: -20px; /* Add some margin at the top */
+    }
+
+    .box_right .text_box h1 {
+        font-size: 2.5em; /* Adjust font size for smaller screens */
+    }
+
+    .box_right .text_box p {
+        font-size: 1.5em; /* Adjust font size for smaller screens */
+    }
+
+    .box_left form h1 {
+        font-size: 1.8em; /* Adjust font size */
+    }
+
+    .box_left input[type="text"],
+    .box_left input[type="password"] {
+        width: 360px; /* Adjust width */
+    }
+
+    .box_left button,
+    .box_left a {
+        width: 100%;
+        text-align: center;
+    }
+
+    .regis {
+        font-size: 0.9em;
+    }
+    .regis hr {
+        width: 120px; /* Adjust width */
+    }
+}
+
+/* Extra small devices (phones, 600px and down) */
+@media (max-width: 600px) {
+    .box_left, .box_right {
+        width: 95% !important;
+        padding: 15px;
+    }
+
+    .box_right .text_box h1 {
+        font-size: 1.8em;
+    }
+
+    .box_right .text_box p {
+        font-size: 0.9em;
+    }
+
+    .box_left form h1 {
+        font-size: 1.5em;
+    }
+
+    .box_left label {
+        font-size: 0.9em;
+    }
+}
+

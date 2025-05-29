@@ -313,7 +313,7 @@ $conn->close();
         showLoadingPopup();
 
         try {
-            const response = await fetch('http://localhost:5000/get_food_details', { 
+            const response = await fetch('https://flask-api-1-e2yx.onrender.com/get_food_details', { 
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 // ส่ง food_id ไปใน body
@@ -511,7 +511,7 @@ $conn->close();
         // ฟังก์ชันสำหรับตรวจสอบว่ามีข้อมูลบันทึกสำหรับวันนี้หรือไม่
         async function checkSavedMeals(username, date) {
             try {
-                const response = await fetch('http://localhost:5000/check_saved_meals', {
+                const response = await fetch('https://flask-api-1-e2yx.onrender.com/check_saved_meals', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ username: username, date: date })
@@ -533,7 +533,7 @@ $conn->close();
         // ฟังก์ชันสำหรับดึงข้อมูลอาหารที่บันทึกไว้
         async function getSavedMeals(username, date) {
             try {
-                const response = await fetch('http://localhost:5000/get_saved_meals', {
+                const response = await fetch('https://flask-api-1-e2yx.onrender.com/get_saved_meals', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ username: username, date: date })
@@ -727,7 +727,7 @@ $conn->close();
          // ดึงข้อมูลแนะนำอาหารจาก API
          async function getFoodRecommendations(username) {
             try {
-                const response = await fetch('http://localhost:5000/get_recommendations', {
+                const response = await fetch('https://flask-api-1-e2yx.onrender.com/get_recommendations', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ username: username })
@@ -1018,9 +1018,9 @@ $conn->close();
                     popupContent.innerHTML = '<div class="food-loading">กำลังโหลดรายการอาหาร...</div>'; // เสดงข้อความโหลดข้อมูล
                     allFetchedFoods = []; // ล้างรายการก่อนหน้า
 
-                    let apiUrl = 'http://localhost:5000/get_food_list'; // อาหารที่เหมาะสม
+                    let apiUrl = 'https://flask-api-1-e2yx.onrender.com/get_food_list'; // อาหารที่เหมาะสม
                     if (type === 'unsuitable') {
-                        apiUrl = 'http://localhost:5000/get_unsuitable_food_list'; // อาหารที่ไม่เหมาะสม
+                        apiUrl = 'https://flask-api-1-e2yx.onrender.com/get_unsuitable_food_list'; // อาหารที่ไม่เหมาะสม
                     }
                 
                     try {
@@ -1387,10 +1387,10 @@ $conn->close();
             checkSavedMeals(username, date)
                 .then(hasSavedMeals => {
                     // ส่งข้อมูลไปยัง api เพื่อบันทึกข้อมูลอาหาร
-                    let apiUrl = 'http://127.0.0.1:5000/save_meals';
+                    let apiUrl = 'https://flask-api-1-e2yx.onrender.com/save_meals';
                     if (hasSavedMeals) {
                         // ถ้ามีบันทึกแล้ว ไป api อัพเดท
-                        apiUrl = 'http://127.0.0.1:5000/update_meals';
+                        apiUrl = 'https://flask-api-1-e2yx.onrender.com/update_meals';
                     }
                     fetch(apiUrl, {
                         method: "POST",

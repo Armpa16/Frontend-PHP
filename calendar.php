@@ -223,7 +223,7 @@ $conn->close();
         const endDate = lastDayOfMonth.toISOString().split('T')[0];
 
         try {
-            const response = await fetch('http://localhost:5000/get_meal_status_for_month', {
+            const response = await fetch('https://flask-api-1-e2yx.onrender.com/get_meal_status_for_month', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username: username, startDate: startDate, endDate: endDate })

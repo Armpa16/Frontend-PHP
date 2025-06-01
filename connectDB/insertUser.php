@@ -27,7 +27,7 @@ $result = $conn->query($sql_check);
 if ($result->num_rows > 0) {
     echo "<script>
             alert('ชื่อผู้ใช้นี้ถูกใช้ไปแล้ว กรุณาเลือกชื่ออื่น');
-            window.location.href='/Food/register.php';
+            window.location.href='/register.php';
           </script>";
     exit();
 }
@@ -35,7 +35,7 @@ if ($result->num_rows > 0) {
 if ($password !== $c_password) {
     echo "<script>
             alert('รหัสผ่านไม่ตรงกัน กรุณาลองใหม่');
-            window.location.href='/Food/register.php';
+            window.location.href='/register.php';
           </script>";
     exit();
 }
@@ -49,12 +49,12 @@ $sql = "INSERT INTO users (username, email, password)
 if ($conn->query($sql) === TRUE) {
     echo "<script>
             alert('สร้างบัญชีสำเร็จ! กรุณากลับไปล็อกอิน');
-            window.location.href='/Food/loginform.php';
+            window.location.href='/loginform.php';
           </script>";
 } else {
     echo "<script>
     alert('เกิดข้อผิดพลาด: " . addslashes($conn->error) . "');
-    window.location.href='/Food/register.php';
+    window.location.href='/register.php';
   </script>";
 }
 

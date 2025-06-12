@@ -6,6 +6,7 @@
     <title>Register</title>
     <link rel="stylesheet" href="css/register.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
     <div class="box_left">
@@ -32,12 +33,18 @@
             </div><br>
             <div class="pass">
                 <label>รหัสผ่าน</label><br><br>
-                <input type="password" name="password"  placeholder="กรุณากรอกรหัสผ่านของคุณ" required>
+                <div style="position: relative; display: flex; align-items: center;">
+                    <input type="password" name="password" id="password" placeholder="กรุณากรอกรหัสผ่านของคุณ" required>
+                    <i class="fas fa-eye" id="togglePassword" style="position: absolute; right: 15px; cursor: pointer; color:#C2C2C2;"></i>
+                </div>
                 <!-- <i class="fa-solid fa-lock"></i> -->
             </div><br>
             <div class="con_pass">
                 <label>ยืนยันรหัสผ่าน</label><br><br>
-                <input type="password" name="c_password"  placeholder="กรุณากรอกรหัสผ่านของคุณอีกครั้ง" required>
+                <div style="position: relative; display: flex; align-items: center;">
+                    <input type="password" name="c_password" id="c_password" placeholder="กรุณากรอกรหัสผ่านของคุณอีกครั้ง" required>
+                    <i class="fas fa-eye" id="toggleCPassword" style="position: absolute; right: 15px; cursor: pointer; color:#C2C2C2;"></i>
+                </div>
                 <!-- <i class="fa-solid fa-lock"></i> -->
             </div><br><br>
             <button type="submit">สร้างบัญชี</button><br><br>
@@ -45,22 +52,66 @@
                 <hr>&nbsp;&nbsp;&nbsp;&nbsp;มีบัญชีผู้ใช้แล้ว? ลงชื่อเข้าใช้&nbsp;&nbsp;&nbsp;&nbsp;<hr>
             </div><br><br>
             <a href="loginform.php">ลงชื่อเข้าใช้</a>
-            <?php
-                if(isset($_GET['status'])){
-                    //ตรวจสอบพบ error 
-                    echo "<script>";
-                    $status=$_GET['status'];
-                if($status==1){
-                    echo "alert(\"ไม่พบผู้ใช้งาน\")";
-                }else if($status==2) {
-                    //echo "alert(\"รหัสผ่านไม่ถูกต้อง\")";
-                    echo "alert(\"รหัสผ่านไม่ถูกต้อง\");";
+        </form>
+        <?php
+            if(isset($_GET['status'])){
+                $status = $_GET['status'];
+                $title = 'เกิดข้อผิดพลาด!';
+                $text = '';
+                $icon = 'error';
+
+                if($status == 1){ // User not found (likely from login redirect)
+                    $text = "ไม่พบผู้ใช้งานในระบบ";
+                } else if($status == 2) { // Incorrect password (likely from login redirect)
+                    $text = "รหัสผ่านไม่ถูกต้อง";
+                } else if($status == 'username_exists') {
+                    $text = "ชื่อผู้ใช้งานนี้มีอยู่ในระบบแล้ว กรุณาใช้ชื่ออื่น";
+                } else if($status == 'email_exists') {
+                    $text = "อีเมลนี้มีอยู่ในระบบแล้ว กรุณาใช้อีเมลอื่น";
+                } else if($status == 'password_mismatch') {
+                    $text = "รหัสผ่านและการยืนยันรหัสผ่านไม่ตรงกัน";
+                } // Add more specific registration errors as needed
+
+                if (!empty($text)) {
+                    echo "<script> Swal.fire({ title: '$title', text: '$text', icon: '$icon', confirmButtonText: 'ตกลง' }); </script>";
                 }
-                    echo "</script>";
-                }
-            ?>
-        </form>  
+            }
+        ?>
     </div>
     <!-- box_right-->
+
+    <script>
+        const togglePassword = document.querySelector('#togglePassword');
+        const password = document.querySelector('#password');
+        const toggleCPassword = document.querySelector('#toggleCPassword');
+        const c_password = document.querySelector('#c_password');
+
+        function addToggleListener(toggleElement, passwordElement) {
+            if (toggleElement && passwordElement) {
+                toggleElement.addEventListener('click', function (e) {
+                    // toggle the type attribute
+                    const type = passwordElement.getAttribute('type') === 'password' ? 'text' : 'password';
+                    passwordElement.setAttribute('type', type);
+                    // toggle the eye slash icon
+                    if (type === 'password') {
+                        this.classList.remove('fa-eye-slash');
+                        this.classList.add('fa-eye');
+                    } else {
+                        this.classList.remove('fa-eye');
+                        this.classList.add('fa-eye-slash');
+                    }
+                });
+            }
+        }
+
+        addToggleListener(togglePassword, password);
+        addToggleListener(toggleCPassword, c_password);
+
+        // CSS for hover effect (can also be in register.css)
+        document.querySelectorAll('.pass i, .con_pass i').forEach(icon => {
+            icon.addEventListener('mouseover', () => icon.style.color = '#000000');
+            icon.addEventListener('mouseout', () => icon.style.color = '#C2C2C2');
+        });
+    </script>
 </body>
 </html>

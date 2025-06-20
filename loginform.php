@@ -35,21 +35,29 @@
             if (isset($_GET['status'])) {
                 $status = $_GET['status'];
                 $title = 'เกิดข้อผิดพลาด!';
-                $text = '';
-                $icon = 'error';
+                $text = ''; // Initialize text
+                $icon = 'error'; // Default icon for errors
+                $redirect = false; // Flag for redirection
 
                 if ($status == 1) {
                     $text = 'ชื่อผู้ใช้งานไม่ถูกต้อง';
                 } else if ($status == 2) {
                     $text = 'รหัสผ่านไม่ถูกต้อง';
+                } else if ($status == 'registered_successfully') { // Handle success case
+                    $title = 'สำเร็จ!';
+                    $text = "สมัครสมาชิกสำเร็จแล้ว กรุณาลงชื่อเข้าใช้";
+                    $icon = 'success';
+                    // No redirect needed here, as the user is already on the login page
                 }
                 // สามารถเพิ่มเงื่อนไข status อื่นๆ ได้ตามต้องการ
 
                 if (!empty($text)) {
-                    echo "<script> Swal.fire({ title: '$title', text: '$text', icon: '$icon', confirmButtonText: 'ตกลง' }); </script>";
+                    echo "<script>";
+                    echo "Swal.fire({ title: '$title', text: '$text', icon: '$icon', confirmButtonText: 'ตกลง' });";
+                    echo "</script>";
                 }
             }
-        ?> 
+        ?>
     </div>
     <!-- box_left -->
     <div class="box_right">
@@ -60,7 +68,8 @@
         </div>
     </div>
     <!-- box_right -->
-     <script>
+
+    <script>
         const togglePassword = document.querySelector('#togglePassword');
         const password = document.querySelector('#password');
 

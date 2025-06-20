@@ -56,24 +56,47 @@
         <?php
             if(isset($_GET['status'])){
                 $status = $_GET['status'];
-                $title = 'เกิดข้อผิดพลาด!';
+                $title = '';
                 $text = '';
-                $icon = 'error';
+                $icon = '';
+                $redirect = false; // Flag to indicate if redirect is needed
 
                 if($status == 1){ // User not found (likely from login redirect)
+                    $title = 'เกิดข้อผิดพลาด!';
                     $text = "ไม่พบผู้ใช้งานในระบบ";
+                    $icon = 'error';
                 } else if($status == 2) { // Incorrect password (likely from login redirect)
+                    $title = 'เกิดข้อผิดพลาด!';
                     $text = "รหัสผ่านไม่ถูกต้อง";
+                    $icon = 'error';
                 } else if($status == 'username_exists') {
+                    $title = 'เกิดข้อผิดพลาด!';
                     $text = "ชื่อผู้ใช้งานนี้มีอยู่ในระบบแล้ว กรุณาใช้ชื่ออื่น";
+                    $icon = 'error';
                 } else if($status == 'email_exists') {
+                    $title = 'เกิดข้อผิดพลาด!';
                     $text = "อีเมลนี้มีอยู่ในระบบแล้ว กรุณาใช้อีเมลอื่น";
+                    $icon = 'error';
                 } else if($status == 'password_mismatch') {
+                    $title = 'เกิดข้อผิดพลาด!';
                     $text = "รหัสผ่านและการยืนยันรหัสผ่านไม่ตรงกัน";
-                } // Add more specific registration errors as needed
+                    $icon = 'error';
+                } else if($status == 'registered_successfully') { // Handle success case
+                    $title = 'สำเร็จ!';
+                    $text = "สมัครสมาชิกสำเร็จแล้ว กรุณาลงชื่อเข้าใช้";
+                    $icon = 'success';
+                    $redirect = true; // Set redirect flag to true
+                }
 
                 if (!empty($text)) {
-                    echo "<script> Swal.fire({ title: '$title', text: '$text', icon: '$icon', confirmButtonText: 'ตกลง' }); </script>";
+                    echo "<script>";
+                    echo "Swal.fire({ title: '$title', text: '$text', icon: '$icon', confirmButtonText: 'ตกลง' })";
+                    if ($redirect) {
+                        echo ".then((result) => { if (result.isConfirmed) { window.location.href = 'loginform.php'; } });";
+                    } else {
+                         echo ";"; // End the SweetAlert call for error cases
+                    }
+                    echo "</script>";
                 }
             }
         ?>

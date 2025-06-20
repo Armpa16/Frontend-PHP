@@ -25,12 +25,12 @@ $sql_check = "SELECT * FROM users WHERE username = '$user'";
 $result = $conn->query($sql_check);
 
 if ($result->num_rows > 0) {
-    header("Location: /Food/register.php?status=username_exists");
+    header("Location: /register.php?status=username_exists");
     exit();
 }
 // Check if passwords match
 if ($password !== $c_password) {
-    header("Location: /Food/register.php?status=password_mismatch");
+    header("Location: /register.php?status=password_mismatch");
     exit();
 }
 
@@ -42,11 +42,11 @@ $sql = "INSERT INTO users (username, email, password)
 
 if ($conn->query($sql) === TRUE) {
     // ส่ง status=registered_successfully ไปยัง loginform.php เพื่อให้แสดง SweetAlert (ถ้าต้องการ)
-    header("Location: /Food/loginform.php?status=registered_successfully");
+    header("Location: /loginform.php?status=registered_successfully");
     exit();
 
 } else {
-    header("Location: /Food/register.php?status=registration_failed&error=" . urlencode($conn->error));
+    header("Location: /register.php?status=registration_failed&error=" . urlencode($conn->error));
     exit();
 }
 

@@ -100,7 +100,9 @@ body {
   align-items: center;
   justify-content: center;
 }
-
+#total-calories {
+  color: #28a745; /* สีเขียวสำหรับแคลอรี่ทั้งหมด */
+}
 .calendar-container:hover {
   transform: scale(1.02); /* ขยายให้เห็นชัดเจน */
   transition: all 0.3s ease;
@@ -393,10 +395,39 @@ body {
 
 .food-actions {
   display: flex;
-  /* justify-content: space-between; */
-  justify-content: center;
+  justify-content: space-between;
+  /* justify-content: center; */
   align-items: center;
   margin-top: 8px;
+}
+.food-quantity-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.increase-btn, .decrease-btn {
+  width: 30px;
+  height: 30px;
+  border: none;
+  cursor: pointer;
+  border-radius: 50%;
+  font-size: 16px;
+}
+.increase-btn:hover{
+  transform: scale(1.05); /* ขยายให้เห็นความเปลี่ยนแปลง */
+  transition: all 0.5s ease;
+  cursor: pointer;
+  font-weight: bold;
+  background-color: #28a745;
+  color: #ffffff;
+}
+.decrease-btn:hover{
+  transform: scale(1.05); /* ขยายให้เห็นความเปลี่ยนแปลง */
+  transition: all 0.5s ease;
+  cursor: pointer;
+  font-weight: bold;
+  background-color: #dc3545;
+  color: #ffffff;
 }
 
 .remove-btn {
@@ -809,6 +840,9 @@ body > div.popup2-overlay.food-details-overlay > div > div.popup-content > h4 {
 .fa-mortar-pestle {
   color: #118AB2; /* โซเดียม */
 }
+.fa-seedling{
+  color: #1c8d36; /* ไฟเบอร์ */
+}
 
 
 /* Loading Spinner CSS */
@@ -874,6 +908,7 @@ border-color: #007bff transparent transparent transparent;
 .bar.open {
     transform: translateX(0);
 }
+
 @media (min-width: 992px) and (max-width: 1300px) {
     .container {
         width: 80%;

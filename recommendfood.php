@@ -371,6 +371,7 @@ $conn->close();
                     <li><i class="fa-solid fa-bacon"></i> ไขมัน: <strong>${foodDetails.fat !== undefined ? foodDetails.fat.toFixed(1) : 'N/A'}</strong>&nbsp; กรัม</li>
                     <li><i class="fa-solid fa-candy-cane"></i> น้ำตาล: <strong>${foodDetails.sugar !== undefined ? foodDetails.sugar.toFixed(1) : 'N/A'}</strong>&nbsp; กรัม</li>
                     <li><i class="fa-solid fa-mortar-pestle"></i> โซเดียม: <strong>${foodDetails.sodium !== undefined ? foodDetails.sodium.toFixed(0) : 'N/A'}</strong>&nbsp; มิลลิกรัม</li>
+                    <li><i class="fa-solid fa-seedling"></i> ไฟเบอร์: <strong>${foodDetails.fiber !== undefined ? foodDetails.fiber.toFixed(0) : 'N/A'}</strong>&nbsp; กรัม</li>
                     <!-- เพิ่มเติมตามข้อมูลที่มี เช่น วิตามิน, แร่ธาตุ -->
                     ${foodDetails.vitamins ? `<li><i class="fa-solid fa-pills"></i> วิตามิน: ${foodDetails.vitamins}</li>` : ''}
                     ${foodDetails.minerals ? `<li><i class="fa-solid fa-gem"></i> แร่ธาตุ: ${foodDetails.minerals}</li>` : ''}
@@ -1109,155 +1110,184 @@ $conn->close();
         }
 
 // ========================================================================================================================
-        function renderMealSet(foodData, container, mealType, selectedFoods, popup) {
-            const mealTranslation = {
-                'breakfast': 'อาหารเช้า',
-                'lunch': 'อาหารกลางวัน',
-                'dinner': 'อาหารเย็น'
-            };
+    // ฟังก์ชันแสดงรายการอาหารใน popup ของแต่ละมื้อ
+    function renderMealSet(foodData, container, mealType, selectedFoods, popup) {
+        const mealTranslation = {
+            'breakfast': 'อาหารเช้า',
+            'lunch': 'อาหารกลางวัน',
+            'dinner': 'อาหารเย็น'
+        };
 
-            container.innerHTML = ''; // เคลียร์เนื้อหาเก่า
+        container.innerHTML = ''; // ล้างเนื้อหาเดิมใน container
 
-            // ตรวจสอบว่า meals มีข้อมูลหรือไม่
-            const meals = foodData.meals;
-            if (!Array.isArray(meals) || meals.length === 0) {
-                const noFoodMessage = document.createElement('div');
-                noFoodMessage.classList.add('no-foods');
-                noFoodMessage.innerText = 'ไม่พบรายการอาหารที่เหมาะสม';
-                container.appendChild(noFoodMessage);
-                return;
-            }
+        const meals = foodData.meals;
+        if (!Array.isArray(meals) || meals.length === 0) {
+            // ถ้าไม่มีรายการอาหาร แสดงข้อความแจ้งเตือน
+            const noFoodMessage = document.createElement('div');
+            noFoodMessage.classList.add('no-foods');
+            noFoodMessage.innerText = 'ไม่พบรายการอาหารที่เหมาะสม';
+            container.appendChild(noFoodMessage);
+            return;
+        }
 
-            const categoryContainer = document.createElement('div');
-            categoryContainer.classList.add('meal-category');
+        const categoryContainer = document.createElement('div');
+        categoryContainer.classList.add('meal-category');
 
-            let mealItemsHTML = '';  // เก็บเนื้อหาของการ์ดอาหาร
+        let mealItemsHTML = '';
 
-            meals.forEach(meal => {
-                // ตรวจสอบว่าอาหารนี้ถูกเลือกหรือไม่
-                const isSelected = selectedFoods.some(food => food.food_id === meal.food_id);
-                const addBtnClass = isSelected ? 'add-food selected' : 'add-food';
-                const addBtnIcon = isSelected ? 'fa-check' : 'fa-plus';
+        // เก็บจำนวนจานของแต่ละเมนู
+        const foodQuantities = {};
 
-                mealItemsHTML += `
-                    <div class="food-card" data-food-id="${meal.food_id}">
-                        <button class="${addBtnClass}" data-food-id="${meal.food_id}"><i class="fa-solid ${addBtnIcon}"></i></button>
-                        <img src="${meal.image_url || 'default-image.jpg'}" class="food-image" alt="${meal.food_name}">
-                        <div class="food-info">
-                            <h4 class="food-name">${meal.food_name}</h4>
-                            <p class="food-calories">${meal.calories} แคลอรี</p>
-                            <p class="food-nutrients">
-                                <i class="fa-solid fa-fire"></i> ${meal.calories} kcal | <i class="fa-solid fa-drumstick-bite"></i> ${meal.protein} g | <i class="fa-solid fa-bread-slice"></i> ${meal.carbohydrate} g 
-                            </p>
-                            <div class="food-actions">
-                                <span class="food-name">${meal.food_name}</span>
-                                <span class="food-amount">${meal.amount}</span>
+        meals.forEach(meal => {
+            // ตรวจสอบว่าอาหารนี้ถูกเลือกอยู่แล้วหรือไม่
+            const isSelected = selectedFoods.some(food => food.food_id === meal.food_id);
+            const addBtnClass = isSelected ? 'add-food selected' : 'add-food';
+            const addBtnIcon = isSelected ? 'fa-check' : 'fa-plus';
+
+            // กำหนดจำนวนเริ่มต้นเป็น 1
+            foodQuantities[meal.food_id] = 1;
+
+            // สร้าง HTML ของการ์ดแต่ละเมนู
+            mealItemsHTML += `
+                <div class="food-card" data-food-id="${meal.food_id}">
+                    <button class="${addBtnClass}" data-food-id="${meal.food_id}"><i class="fa-solid ${addBtnIcon}"></i></button>
+                    <img src="${meal.image_url || 'default-image.jpg'}" class="food-image" alt="${meal.food_name}">
+                    <div class="food-info">
+                        <h4 class="food-name">${meal.food_name}</h4>
+                        <p class="food-calories">${meal.calories} แคลอรี</p>
+                        <p class="food-nutrients">
+                            <i class="fa-solid fa-fire"></i> ${meal.calories} kcal | <i class="fa-solid fa-drumstick-bite"></i> ${meal.protein} g | <i class="fa-solid fa-bread-slice"></i> ${meal.carbohydrate} g 
+                        </p>
+                        <div class="food-actions">
+                            <div class="food-quantity-controls">
+                                <button class="decrease-btn" data-food-id="${meal.food_id}">-</button>
+                                <span class="food-quantity" id="quantity-${meal.food_id}">1</span>
+                                <button class="increase-btn" data-food-id="${meal.food_id}">+</button>
                             </div>
+                            <span class="food-amount">${meal.amount}</span>
                         </div>
                     </div>
-                `;
-            });
+                </div>
+            `;
+        });
 
-            categoryContainer.innerHTML += mealItemsHTML;  // เพิ่มการ์ดอาหารลงใน category
-            container.appendChild(categoryContainer);
+        // แสดงผลการ์ดอาหาร
+        categoryContainer.innerHTML += mealItemsHTML;
+        container.appendChild(categoryContainer);
 
-            // เพิ่ม event listener สำหรับปุ่ม add-food
-            const addFoodBtns = container.querySelectorAll('.add-food');
-            addFoodBtns.forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const foodId = this.getAttribute('data-food-id');
-                    const foodCard = this.closest('.food-card');
-                    
-                    // Find the original meal object from the 'meals' array (passed to renderMealSet)
-                    const originalMealData = meals.find(m => m.food_id == foodId); // Use == for potential type flexibility
+        // เพิ่ม Event สำหรับปุ่ม เพิ่ม/ลด จำนวนอาหาร
+        document.addEventListener('click', function (event) {
+            if (event.target.closest('.increase-btn')) {
+                const foodId = event.target.closest('.increase-btn').dataset.foodId;
+                foodQuantities[foodId]++;
+                document.getElementById(`quantity-${foodId}`).innerText = foodQuantities[foodId];
 
-                    if (originalMealData) {
-                        const foodName = originalMealData.food_name;
-                        const calories = originalMealData.calories;
-                        const protein = originalMealData.protein;
-                        const carbohydrate = originalMealData.carbohydrate;
-                        const amount = originalMealData.amount || '1 จาน'; // Default if amount is not present
-                        const imageUrl = originalMealData.image_url;
+                // อัปเดตจำนวนใน selectedFoods ทันทีถ้ามีอยู่แล้ว
+                const selectedFood = selectedFoods.find(food => food.food_id === foodId);
+                if (selectedFood) {
+                    selectedFood.quantity = foodQuantities[foodId];
+                }
+            }
 
-                        // ตรวจสอบว่าอาหารนี้ถูกเลือกแล้วหรือไม่
-                        const existingIndex = selectedFoods.findIndex(food => food.food_id === foodId);
+            if (event.target.closest('.decrease-btn')) {
+                const foodId = event.target.closest('.decrease-btn').dataset.foodId;
+                if (foodQuantities[foodId] > 1) {
+                    foodQuantities[foodId]--;
+                    document.getElementById(`quantity-${foodId}`).innerText = foodQuantities[foodId];
 
-                        if (existingIndex >= 0) {
-                            // ถ้าเลือกแล้ว ให้ลบออก
-                            selectedFoods.splice(existingIndex, 1);
-                            this.classList.remove('selected');
-                            this.innerHTML = '<i class="fa-solid fa-plus"></i>';
-                        } else {
-                            // ถ้ายังไม่ได้เลือก ให้เพิ่มเข้าไป
-                            selectedFoods.push({
-                                food_id: foodId,
-                                food_name: foodName,
-                                calories: parseFloat(calories),
-                                protein: parseFloat(protein),
-                                carbohydrate: parseFloat(carbohydrate),
-                                amount: amount,
-                                image_url: imageUrl
-                            });
-                            this.classList.add('selected');
-                            this.innerHTML = '<i class="fa-solid fa-check"></i>';
-                        }
-                        // อัพเดทจำนวนที่เลือกบนปุ่ม "เพิ่ม"
-                        updateSelectedCount(selectedFoods.length, popup);
-                    } else {
-                        console.error(`Meal data not found for food_id: ${foodId} in popup selection.`);
+                    // อัปเดตจำนวนใน selectedFoods ทันทีถ้ามีอยู่แล้ว
+                    const selectedFood = selectedFoods.find(food => food.food_id === foodId);
+                    if (selectedFood) {
+                        selectedFood.quantity = foodQuantities[foodId];
                     }
-                });
+                }
+            }
+        });
+
+        // เพิ่ม Event สำหรับปุ่ม เพิ่ม/ลบ รายการอาหารใน popup
+        const addFoodBtns = container.querySelectorAll('.add-food');
+        addFoodBtns.forEach(btn => {
+            btn.addEventListener('click', function () {
+                const foodId = this.getAttribute('data-food-id');
+                const meal = meals.find(m => m.food_id == foodId);
+
+                if (meal) {
+                    const quantity = foodQuantities[foodId] || 1;
+
+                    // เช็คว่าอาหารนี้ถูกเลือกไปแล้วหรือยัง
+                    const existingIndex = selectedFoods.findIndex(food => food.food_id === foodId);
+
+                    if (existingIndex >= 0) {
+                        // ถ้าเลือกแล้ว -> ยกเลิกการเลือก
+                        selectedFoods.splice(existingIndex, 1);
+                        this.classList.remove('selected');
+                        this.innerHTML = '<i class="fa-solid fa-plus"></i>';
+                    } else {
+                        // ถ้ายังไม่ได้เลือก -> เพิ่มอาหาร พร้อมจำนวน
+                        selectedFoods.push({
+                            food_id: foodId,
+                            food_name: meal.food_name,
+                            calories: parseFloat(meal.calories),
+                            protein: parseFloat(meal.protein),
+                            carbohydrate: parseFloat(meal.carbohydrate),
+                            amount: meal.amount || '1 จาน',
+                            image_url: meal.image_url,
+                            quantity: quantity // จำนวนที่เลือก
+                        });
+                        this.classList.add('selected');
+                        this.innerHTML = '<i class="fa-solid fa-check"></i>';
+                    }
+
+                    // อัพเดทจำนวนที่เลือกในปุ่ม "เพิ่ม"
+                    updateSelectedCount(selectedFoods.length, popup);
+                }
             });
+        });
+    }
+
+    // ========================================================================================================================
+    // อัพเดทจำนวนอาหารที่เลือกในปุ่ม "เพิ่ม"
+    function updateSelectedCount(count, popup) {
+        const countElement = popup.querySelector('.selected-count');
+        countElement.textContent = `(${count})`;
+
+        const submitBtn = popup.querySelector('.submit-food-btn');
+        if (count > 0) {
+            submitBtn.classList.add('has-items');
+        } else {
+            submitBtn.classList.remove('has-items');
+        }
+    }
+
+    // เพิ่มรายการอาหารที่เลือกไปยังหน้าหลัก
+    function addSelectedFoodsToMeal(selectedFoods, mealType) {
+        const mealSection = document.querySelector(`.meal-section[data-meal-type="${mealType}"]`);
+        if (!mealSection) return;
+
+        const mealBody = mealSection.querySelector('.meal-body');
+        if (!mealBody) return;
+
+        if (mealBody.classList.contains('empty-meal')) {
+            mealBody.innerHTML = '';
+            mealBody.classList.remove('empty-meal');
         }
 
-// ========================================================================================================================
-        // ฟังก์ชันอัพเดทจำนวนอาหารที่เลือกบนปุ่ม "เพิ่ม"
-        function updateSelectedCount(count, popup) {
-            const countElement = popup.querySelector('.selected-count');
-            countElement.textContent = `(${count})`;
-            
-            // เพิ่มการเปลี่ยนสีปุ่มเมื่อมีการเลือกอาหาร
-            const submitBtn = popup.querySelector('.submit-food-btn');
-            if (count > 0) {
-                submitBtn.classList.add('has-items');
-            } else {
-                submitBtn.classList.remove('has-items');
-            }
-        }
+        let totalMealCalories = 0;
 
-        // ฟังก์ชันเพิ่มรายการอาหารที่เลือกไปยังหน้าหลัก
-        function addSelectedFoodsToMeal(selectedFoods, mealType) {
-            // หา meal-section ที่มี data-meal-type ตรงกับ mealType
-            const mealSection = document.querySelector(`.meal-section[data-meal-type="${mealType}"]`);
-            if (!mealSection) {
-                console.error(`ไม่พบส่วนอาหาร ${mealType} ในหน้าหลัก`);
-                return;
-            }
+        // วนลูปอาหารที่เลือกทั้งหมด
+        selectedFoods.forEach(food => {
+            const quantity = food.quantity || 1;
 
-            // หา meal-body ภายใน meal-section
-            const mealBody = mealSection.querySelector('.meal-body');
-            if (!mealBody) {
-                console.error(`ไม่พบ meal-body ใน ${mealType}`);
-                return;
-            }
-
-            // ลบข้อความ "ไม่มีข้อมูลรายการอาหาร" ถ้ามี
-            if (mealBody.classList.contains('empty-meal')) {
-                mealBody.innerHTML = '';
-                mealBody.classList.remove('empty-meal');
-            }
-
-            // เพิ่มรายการอาหารที่เลือกไปยัง meal-body
-            let totalMealCalories = 0;
-            selectedFoods.forEach(food => {
+            // เพิ่มอาหารตามจำนวนที่เลือก
+            for (let i = 0; i < quantity; i++) {
                 const foodElement = document.createElement('div');
                 foodElement.className = 'food-card';
                 foodElement.setAttribute('data-food-id', food.food_id);
-                // เพิ่ม data-calories เพื่อใช้ในการคำนวณเมื่อลบ
                 foodElement.setAttribute('data-protein', food.protein || 0);
                 foodElement.setAttribute('data-carbohydrate', food.carbohydrate || 0);
                 foodElement.setAttribute('data-calories', food.calories);
 
+                // สร้างการ์ดอาหารในหน้าหลัก
                 foodElement.innerHTML = `
                     <button class="delete-food-btn"><i class="fa-solid fa-trash"></i></button>
                     <img src="${food.image_url}" class="food-image" alt="${food.food_name}">
@@ -1268,97 +1298,78 @@ $conn->close();
                             <i class="fa-solid fa-fire"></i> ${food.calories} kcal | <i class="fa-solid fa-drumstick-bite"></i> ${food.protein} g | <i class="fa-solid fa-bread-slice"></i> ${food.carbohydrate} g 
                         </p>
                         <div class="food-actions">
-                            <span class="food-name">${food.food_name}</span>
                             <span class="food-amount">${food.amount}</span>
                         </div>
                     </div>
                 `;
 
-                // เพิ่ม event listener สำหรับปุ่มลบ
+                // Event ลบอาหารออกจากหน้าหลัก
                 const deleteBtn = foodElement.querySelector('.delete-food-btn');
-                deleteBtn.addEventListener('click', function() {
-                    // ดึงค่าแคลอรี่ของอาหารที่กำลังจะลบ
+                deleteBtn.addEventListener('click', function () {
                     const foodCalories = parseFloat(foodElement.getAttribute('data-calories')) || 0;
-                    
-                    // ลบรายการอาหารจาก UI
                     mealBody.removeChild(foodElement);
-                    
-                    // อัพเดทจำนวนแคลอรี่ของมื้อนี้
                     updateMealCalories(mealSection, -foodCalories);
-                    
-                    // อัพเดทจำนวนแคลอรี่ทั้งหมด
                     updateTotalCalories();
-                    
-                    // ตรวจสอบว่ามีรายการอาหารเหลืออยู่หรือไม่
+
+                    // ถ้าลบจนหมด แสดงข้อความ "ไม่มีข้อมูลรายการอาหาร"
                     if (mealBody.children.length === 0) {
                         mealBody.innerHTML = 'ไม่มีข้อมูลรายการอาหาร';
                         mealBody.classList.add('empty-meal');
-                        
-                        // รีเซ็ตจำนวนแคลอรี่ของมื้อนี้เป็น 0
                         const mealCalories = mealSection.querySelector('.meal-calories');
-                        if (mealCalories) {
-                            mealCalories.textContent = '0 แคลอรี';
-                        }
+                        if (mealCalories) mealCalories.textContent = '0 แคลอรี';
                     }
-                    
-                    // บันทึกการเปลี่ยนแปลงไปยัง server (ต้องสร้างฟังก์ชันนี้เพิ่มเติม)
+
                     saveMealToServer(mealType, getMealFoodData(mealBody));
                 });
 
                 mealBody.appendChild(foodElement);
                 totalMealCalories += parseFloat(food.calories);
-            });
-
-            // อัพเดทจำนวนแคลอรี่ของมื้อนี้
-            updateMealCalories(mealSection, totalMealCalories);
-
-            // อัพเดทจำนวนแคลอรี่ทั้งหมด
-            updateTotalCalories();
-            
-            // บันทึกข้อมูลลง localStorage (เพื่อใช้ชั่วคราว) หรือส่งไปที่ API
-            saveMealToServer(mealType, selectedFoods);
-        }
-
-        // ฟังก์ชันสำหรับอัพเดทแคลอรี่ของมื้ออาหาร
-        function updateMealCalories(mealSection, caloriesChange) {
-            const mealCaloriesElement = mealSection.querySelector('.meal-calories');
-            if (mealCaloriesElement) {
-                // ดึงจำนวนแคลอรี่ปัจจุบัน
-                const currentCaloriesText = mealCaloriesElement.textContent;
-                const currentCalories = parseFloat(currentCaloriesText) || 0;
-                const newTotalCalories = Math.max(0, currentCalories + caloriesChange);
-                mealCaloriesElement.textContent = `${newTotalCalories.toFixed(0)} แคลอรี`;
             }
-        }
+        });
 
-        // ฟังก์ชันอัพเดทจำนวนแคลอรี่ทั้งหมด
-        function updateTotalCalories() {
-            let totalDailyCalories = 0;
-            const mealCaloriesElements = document.querySelectorAll('.meal-calories');
-            
-            mealCaloriesElements.forEach(element => {
-                const caloriesText = element.textContent;
-                // แยกตัวเลขออกจากข้อความ "แคลอรี"
-                const calories = parseFloat(caloriesText) || 0;
-                totalDailyCalories += calories;
-            });
-            
-            const totalCaloriesElement = document.getElementById('total-calories');
-            if (totalCaloriesElement) {
-                totalCaloriesElement.textContent = totalDailyCalories.toFixed(0);
-            }
-        }
+        updateMealCalories(mealSection, totalMealCalories);
+        updateTotalCalories();
+        saveMealToServer(mealType, selectedFoods);
+    }
 
-        
-        function addFoodButtonListeners() {
-            const addFoodButtons = document.querySelectorAll('.add-food-btn');
-            addFoodButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const mealType = this.getAttribute('data-meal-type');
-                    showFoodSelectionPopup(mealType);
-                });
-            });
+    // อัพเดทแคลอรี่ของมื้ออาหาร
+    function updateMealCalories(mealSection, caloriesChange) {
+        const mealCaloriesElement = mealSection.querySelector('.meal-calories');
+        if (mealCaloriesElement) {
+            const currentCalories = parseFloat(mealCaloriesElement.textContent) || 0;
+            const newTotalCalories = Math.max(0, currentCalories + caloriesChange);
+            mealCaloriesElement.textContent = `${newTotalCalories.toFixed(0)} แคลอรี`;
         }
+    }
+
+    // อัพเดทแคลอรี่รวมทั้งวัน
+    function updateTotalCalories() {
+        let totalDailyCalories = 0;
+        const mealCaloriesElements = document.querySelectorAll('.meal-calories');
+
+        mealCaloriesElements.forEach(element => {
+            const calories = parseFloat(element.textContent) || 0;
+            totalDailyCalories += calories;
+        });
+
+        const totalCaloriesElement = document.getElementById('total-calories');
+        if (totalCaloriesElement) {
+            totalCaloriesElement.textContent = totalDailyCalories.toFixed(0);
+        }
+    }
+
+    // ฟังก์ชันเปิด popup เลือกรายการอาหาร
+    function addFoodButtonListeners() {
+        const addFoodButtons = document.querySelectorAll('.add-food-btn');
+        addFoodButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                const mealType = this.getAttribute('data-meal-type');
+                showFoodSelectionPopup(mealType);
+            });
+        });
+    }
+// ========================================================================================================================
+
 
         // เพิ่ม CSS สำหรับปุ่มที่เลือกแล้ว
         const style = document.createElement('style');

@@ -30,7 +30,7 @@ body {
     display: flex;
     margin: 0;
     padding: 0;
-    height: 1150px;
+    height: auto;
 }
 .fa-solid .fa-circle-user{
     font-size: 100px;
@@ -171,7 +171,7 @@ span p{
     align-items: center;
     justify-content: center; 
     color: rgb(53, 53, 53); 
-    /* margin-left: -15px; */
+    /* margin-left: -5px; */
 }
 .dis{
     width: 250px;
@@ -294,6 +294,45 @@ h1{
 
 .bar.open {
     transform: translateX(0);
+}
+.nutrients_day, .nutrients_day-2 {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.nutrients_day .chart-container {
+  max-width: 450px;
+  height: auto;
+}
+.nutrients_day .chart-container button ,.nutrients_day .chart-container span{
+    font-size: 12px; 
+  
+}
+.nutrients_day-2 .chart-container {
+    width: 100%;
+    height: 350px;
+    display: flex;
+    flex-direction: column; 
+    align-items: center;    /* จัดกราฟให้อยู่กลางแนวนอน */
+}
+
+.nutrients_day-2 .chart-container .calendar-controls {
+    width: 100%; 
+    display: flex;
+    justify-content: space-between; 
+    align-items: center; 
+}
+
+.nutrients_day-2 .chart-container button,
+.nutrients_day-2 .chart-container span {
+    font-size: 14px;
+}
+
+#SodiumChart {
+    max-width: 80%;    /* ปรับเปอร์เซ็นต์ให้เล็กลงได้ */
+    max-height: 80%;   /* ลดขนาดกราฟ */
 }
 
 @media (min-width: 992px) and (max-width: 1300px) {
@@ -453,16 +492,66 @@ h1{
         width: 100%; 
         height: 300px; 
     }
+    #ProteinChart {
+        width: 100%;
+        height: 300px;  
+    }
+    #CarbohydrateChart {
+        width: 100%;
+        height: 300px;  
+    }
+    #SugarChart {
+        width: 100%;
+        height: 300px;  
+    }
+    #FatChart {
+        width: 100%;
+        height: 300px;  
+    }
+    #SodiumChart {
+        width: 100%;
+        height: 300px; 
+        max-width: 100%;   
+        max-height: 100%;  
+    }
     #week-label {
         font-size: 16px; 
     }
     .calendar-controls button {
         width: 25%; 
         margin: 5px 0; /* คง margin เดิม */
-        font-size: 12px; /* ลดขนาดตัวอักษรลงเล็กน้อย */
+        font-size: 10px; /* ลดขนาดตัวอักษรลงเล็กน้อย */
         padding: 6px 8px; /* ลด padding เพื่อให้ปุ่มเล็กลง */
     }
-
+    .nutrients_day {
+        flex-direction: column; /* เปลี่ยนเป็นแนวตั้ง */
+        align-items: center; /* จัดกึ่งกลางแนวตั้ง */
+        gap: 10px; /* เพิ่มระยะห่างระหว่างกราฟ */
+    }
+    .nutrients_day .chart-container button{
+        width: 25%; 
+        margin: 5px 0; /* คง margin เดิม */
+        font-size: 10px; /* ลดขนาดตัวอักษรลงเล็กน้อย */
+        padding: 6px 8px; /* ลด padding เพื่อให้ปุ่มเล็กลง */
+        
+    }
+    .nutrients_day-2{
+        width: 100%; 
+        height: auto; 
+        margin-top: 0;
+    }
+    .nutrients_day-2 .chart-container{
+        width: 100%; 
+        height: 100%;
+        max-width: 100%; 
+    }
+    .nutrients_day-2 .chart-container button{
+        width: 25%; 
+        margin: 5px 0; /* คง margin เดิม */
+        font-size: 10px; /* ลดขนาดตัวอักษรลงเล็กน้อย */
+        padding: 6px 8px; /* ลด padding เพื่อให้ปุ่มเล็กลง */
+        
+    }
 }
 @media screen and (min-width: 768px) and (max-width: 900px) {
     #sidebarToggle {
@@ -569,7 +658,7 @@ h1{
         width: 100%; 
         height: auto; 
         margin-top: 0;
-        margin-left: 20px;
+        margin-left: 10px;
     }
     .diseases_show .cercle {
         width: 56px;
@@ -606,6 +695,21 @@ h1{
         width: 100%; 
         height: 300px; 
     }
+    #ProteinChart {
+        width: 100%; 
+    }
+    #CarbohydrateChart {
+        width: 100%; 
+    }
+    #SugarChart {
+        width: 100%;
+    }
+    #FatChart {
+        width: 100%;
+    }
+    #SodiumChart {
+        width: 100%;
+    }
     #week-label {
         font-size: 16px; 
     }
@@ -615,6 +719,30 @@ h1{
         font-size: 12px; /* ลดขนาดตัวอักษรลงเล็กน้อย */
         padding: 6px 8px; /* ลด padding เพื่อให้ปุ่มเล็กลง */
     }
+    .nutrients_day .chart-container button{
+        width: 25%; 
+        font-size: 9px; /* ลดขนาดตัวอักษรลงเล็กน้อย */    
+    }
+    .nutrients_day .chart-container {
+        max-width: 600px;
+        height: auto; 
+    }
+    .nutrients_day-2{
+        width: 100%;
+        height: 350px; 
+    }
+    .nutrients_day-2 .chart-container{
+        width: 100%; 
+        height: 250px;
+    }
+    .nutrients_day-2 .chart-container button{
+        width: 15%; 
+        margin: 5px 0; /* คง margin เดิม */
+        font-size: 10px; /* ลดขนาดตัวอักษรลงเล็กน้อย */
+        padding: 6px 8px; /* ลด padding เพื่อให้ปุ่มเล็กลง */
+        
+    }
+    
 }
 
 

@@ -971,7 +971,15 @@ $conn->close();
                     </div>
                     <div class="popup-search">
                         <input type="text" id="food-search" placeholder="ค้นหาอาหาร...">
-                    </div>
+                        <select id="category-filter">
+                            <option value="">ทุกหมวดหมู่</option>
+                            <option value="อาหารจานหลัก">อาหารจานหลัก</option>
+                            <option value="ผลไม้">ผลไม้</option>
+                            <option value="ขนม">ขนม</option>
+                            <option value="เครื่องดื่ม">เครื่องดื่ม</option>
+                            <option value="ฟาสต์ฟู้ด">ฟาสต์ฟู้ด</option>
+                        </select>
+                        </div>
                     <div class="popup-content">
                         <div class="food-loading">กำลังโหลดรายการอาหาร...</div>
                     </div>
@@ -998,6 +1006,7 @@ $conn->close();
                 const submitBtn = popup.querySelector('.submit-food-btn');
                 const foodOptionsSelect = popup.querySelector('.options-food');
                 const popupContent = popup.querySelector('.popup-content');
+                const categoryFilter = popup.querySelector('#category-filter');
                 
                 closeBtn.addEventListener('click', () => document.body.removeChild(overlay));
                 cancelBtn.addEventListener('click', () => document.body.removeChild(overlay));
@@ -1089,19 +1098,27 @@ $conn->close();
                     selectedFoods.length = 0; // ล้างรายการอาหารที่เลือก
                     updateSelectedCount(0, popup); // อัพเดทจำนวนอาหารที่เลือก
                     searchInput.value = ''; // เคลียร์ช่องค้นหา
+                    categoryFilter.value = ''; // เคลียร์หมวดหมู่
                     loadAndRenderFoods(event.target.value);
                 });
 
-                // ตัวรับอินพุตค้นหา
-                searchInput.addEventListener('input', () => {
+                // ฟังก์ชันสำหรับกรองและแสดงผล
+                function applyFilters() {
                     const searchTerm = searchInput.value.toLowerCase();
-                    const filteredData = {
-                        meals: allFetchedFoods.filter(meal =>
-                            meal.food_name.toLowerCase().includes(searchTerm)
-                        )
-                    };
-                    renderMealSet(filteredData, popupContent, mealType, selectedFoods, popup);
-                });
+                    const selectedCategory = categoryFilter.value;
+
+                    const filteredFoods = allFetchedFoods.filter(meal => {
+                        // Assuming meal object has a 'category' property from the backend
+                        const nameMatch = meal.food_name.toLowerCase().includes(searchTerm);
+                        const categoryMatch = !selectedCategory || meal.category === selectedCategory;
+                        return nameMatch && categoryMatch;
+                    });
+                    renderMealSet({ meals: filteredFoods }, popupContent, mealType, selectedFoods, popup);
+                }
+
+                // Event listeners สำหรับการกรอง
+                searchInput.addEventListener('input', applyFilters);
+                categoryFilter.addEventListener('change', applyFilters);
 
             } catch (error) {
                 console.error('Error showing food popup:', error);

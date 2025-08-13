@@ -200,10 +200,70 @@ $conn->close();
                     <canvas id="calorieChart"></canvas>
                 </div>
             </div>
+            <h1>สารอาหารที่ได้รับในแต่ละวัน</h1>
+                <div class="nutrients_day">
+                    <div class="card chart-container">
+                        <div class="calendar-controls">
+                            <!-- <button >◀ ก่อนหน้า</button> -->
+                            <button onclick="changeWeekProtein(-1)">◀ ก่อนหน้า</button>
+                            <span id="week-label-protein"></span>
+                            <!-- <button >ถัดไป ▶</button> -->
+                            <button onclick="changeWeekProtein(1)">ถัดไป ▶</button>
+                        </div>
+                        <canvas id="ProteinChart"></canvas>
+                    </div>
+                    <div class="card chart-container">
+                        <div class="calendar-controls">
+                            <!-- <button >◀ ก่อนหน้า</button> -->
+                            <button onclick="changeWeekCarbohydrate(-1)">◀ ก่อนหน้า</button>
+                            <span id="week-label-carb"></span>
+                            <!-- <button >ถัดไป ▶</button> -->
+                            <button onclick="changeWeekCarbohydrate(1)">ถัดไป ▶</button>
+                        </div>
+                        <canvas id="CarbohydrateChart"></canvas>
+                    </div>
+                </div>
+                <!-- กราฟเเถว 2 -->
+                <div class="nutrients_day">
+                    <div class="card chart-container">
+                        <div class="calendar-controls">
+                            <!-- <button >◀ ก่อนหน้า</button> -->
+                            <button onclick="changeWeekSugar(-1)">◀ ก่อนหน้า</button>
+                            <span id="week-label-sugar"></span>
+                            <!-- <button >ถัดไป ▶</button> -->
+                            <button onclick="changeWeekSugar(1)">ถัดไป ▶</button>
+                        </div>
+                        <canvas id="SugarChart"></canvas>
+                    </div>
+                    <div class="card chart-container">
+                        <div class="calendar-controls">
+                            <!-- <button >◀ ก่อนหน้า</button> -->
+                            <button onclick="changeWeekFat(-1)">◀ ก่อนหน้า</button>
+                            <span id="week-label-fat"></span>
+                            <!-- <button >ถัดไป ▶</button> -->
+                            <button onclick="changeWeekFat(1)">ถัดไป ▶</button>
+                        </div>
+                        <canvas id="FatChart"></canvas>
+                    </div>
+                </div>
+                <!-- กราฟเเถว 3 -->
+                <div class="nutrients_day-2">
+                    <div class="card chart-container">
+                        <div class="calendar-controls">
+                            <!-- <button >◀ ก่อนหน้า</button> -->
+                            <button onclick="changeWeekSodium(-1)">◀ ก่อนหน้า</button>
+                            <span id="week-label-sodium"></span>
+                            <!-- <button >ถัดไป ▶</button> -->
+                            <button onclick="changeWeekSodium(1)">ถัดไป ▶</button>
+                        </div>
+                        <canvas id="SodiumChart"></canvas>
+                    </div>
+                </div>
+                <!-- nutrients_day -->
+            </div>
+            <!-- content -->
         </div>
-        <!-- content -->
-    </div>
-    <!-- container -->
+        <!-- container -->
 
 
 
@@ -295,7 +355,7 @@ $conn->close();
             data: {
                 labels: [],
                 datasets: [{
-                    label: 'Kcal',
+                    label: 'เเคลอรี่ (kcal)',
                     data: [],
                     backgroundColor: 'rgba(59, 130, 246, 0.7)',
                     borderRadius: 10,
@@ -348,6 +408,335 @@ $conn->close();
         // --- End Sidebar Toggle JavaScript ---
 
         updateChart();
+    
+// ========================================================================================================================
+        let currentDateProtein = new Date();
+        let currentDateCarb = new Date();
+        let currentDateSugar = new Date();
+        let currentDateFat = new Date();
+        let currentDateSodium = new Date();
+
+
+        // ------------------------- โปรตีน -------------------------
+        async function getProteinForWeek(startDate) {
+            const endDate = new Date(startDate);
+            endDate.setDate(startDate.getDate() + 6);
+            const formattedStartDate = startDate.toISOString().split('T')[0];
+            const formattedEndDate = endDate.toISOString().split('T')[0];
+
+            try {
+                const response = await fetch('https://flask-api-1-e2yx.onrender.com/get_protein_for_week', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, startDate: formattedStartDate, endDate: formattedEndDate })
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    return data.proteinData;
+                }
+            } catch (err) {
+                console.error("Error fetching protein:", err);
+            }
+            return {};
+        }
+
+        async function updateProteinChart() {
+            const days = getWeekDays(currentDateProtein);
+            const labels = days.map(formatThaiDate);
+            const proteinData = await getProteinForWeek(days[0]);
+            const data = days.map(day => {
+                const key = day.toISOString().split('T')[0];
+                return proteinData[key]?.protein || 0;
+            });
+
+            document.getElementById('week-label-protein').textContent = `${labels[0]} - ${labels[6]}`;
+            ProteinChart.data.labels = labels;
+            ProteinChart.data.datasets[0].data = data;
+            ProteinChart.update();
+        }
+
+        function changeWeekProtein(direction) {
+            currentDateProtein.setDate(currentDateProtein.getDate() + (direction * 7));
+            updateProteinChart();
+        }
+
+        const ctxProtein = document.getElementById('ProteinChart').getContext('2d');
+        const ProteinChart = new Chart(ctxProtein, {
+            type: 'bar',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'โปรตีน (g)',
+                    backgroundColor: '#E94F37',
+                    data: [],
+                    borderRadius: 10,
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+        updateProteinChart();
+
+        // ------------------------- คาร์โบไฮเดรต -------------------------
+        async function getCarbohydrateForWeek(startDate) {
+            const endDate = new Date(startDate);
+            endDate.setDate(startDate.getDate() + 6);
+            const formattedStartDate = startDate.toISOString().split('T')[0];
+            const formattedEndDate = endDate.toISOString().split('T')[0];
+
+            try {
+                const response = await fetch('https://flask-api-1-e2yx.onrender.com/get_carbohydrate_for_week', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, startDate: formattedStartDate, endDate: formattedEndDate })
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    return data.carbohydrateData;
+                }
+            } catch (err) {
+                console.error("Error fetching carb:", err);
+            }
+            return {};
+        }
+
+        async function updateCarbohydrateChart() {
+            const days = getWeekDays(currentDateCarb);
+            const labels = days.map(formatThaiDate);
+            const carbData = await getCarbohydrateForWeek(days[0]);
+            const data = days.map(day => {
+                const key = day.toISOString().split('T')[0];
+                return carbData[key]?.carbohydrate || 0;
+            });
+
+            document.getElementById('week-label-carb').textContent = `${labels[0]} - ${labels[6]}`;
+            CarbohydrateChart.data.labels = labels;
+            CarbohydrateChart.data.datasets[0].data = data;
+            CarbohydrateChart.update();
+        }
+
+        function changeWeekCarbohydrate(direction) {
+            currentDateCarb.setDate(currentDateCarb.getDate() + (direction * 7));
+            updateCarbohydrateChart();
+        }
+
+        const ctxCarb = document.getElementById('CarbohydrateChart').getContext('2d');
+        const CarbohydrateChart = new Chart(ctxCarb, {
+            type: 'bar',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'คาร์โบไฮเดรต (g)',
+                    backgroundColor: '#FFD166',
+                    data: [],
+                    borderRadius: 10,
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+        updateCarbohydrateChart();
+        
+        // ------------------------- น้ำตาล -------------------------
+        async function getSugarForWeek(startDate) {
+            const endDate = new Date(startDate);
+            endDate.setDate(startDate.getDate() + 6);
+            const formattedStartDate = startDate.toISOString().split('T')[0];
+            const formattedEndDate = endDate.toISOString().split('T')[0];
+
+            try {
+                const response = await fetch('https://flask-api-1-e2yx.onrender.com/get_sugar_for_week', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, startDate: formattedStartDate, endDate: formattedEndDate })
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    return data.sugarData;
+                }
+            } catch (err) {
+                console.error("Error fetching sugar:", err);
+            }
+            return {};
+        }
+
+        async function updateSugarChart() {
+            const days = getWeekDays(currentDateSugar);
+            const labels = days.map(formatThaiDate);
+            const sugarData = await getSugarForWeek(days[0]);
+            const data = days.map(day => {
+                const key = day.toISOString().split('T')[0];
+                return sugarData[key]?.sugar || 0;
+            });
+
+            document.getElementById('week-label-sugar').textContent = `${labels[0]} - ${labels[6]}`;
+            SugarChart.data.labels = labels;
+            SugarChart.data.datasets[0].data = data;
+            SugarChart.update();
+        }
+
+        function changeWeekSugar(direction) {
+            currentDateSugar.setDate(currentDateSugar.getDate() + (direction * 7));
+            updateSugarChart();
+        }
+
+        const ctxSugar = document.getElementById('SugarChart').getContext('2d');
+        const SugarChart = new Chart(ctxSugar, {
+            type: 'bar',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'น้ำตาล (g)',
+                    backgroundColor: '#A162E8',
+                    data: [],
+                    borderRadius: 10,
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+        updateSugarChart();
+
+        // ------------------------- ไขมัน -------------------------
+        async function getFatForWeek(startDate) {
+            const endDate = new Date(startDate);
+            endDate.setDate(startDate.getDate() + 6);
+            const formattedStartDate = startDate.toISOString().split('T')[0];
+            const formattedEndDate = endDate.toISOString().split('T')[0];
+
+            try {
+                const response = await fetch('https://flask-api-1-e2yx.onrender.com/get_fat_for_week', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, startDate: formattedStartDate, endDate: formattedEndDate })
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    return data.fatData;
+                }
+            } catch (err) {
+                console.error("Error fetching fat:", err);
+            }
+            return {};
+        }
+
+        async function updateFatChart() {
+            const days = getWeekDays(currentDateFat);
+            const labels = days.map(formatThaiDate);
+            const fatData = await getFatForWeek(days[0]);
+            const data = days.map(day => {
+                const key = day.toISOString().split('T')[0];
+                return fatData[key]?.fat || 0;
+            });
+
+            document.getElementById('week-label-fat').textContent = `${labels[0]} - ${labels[6]}`;
+            FatChart.data.labels = labels;
+            FatChart.data.datasets[0].data = data;
+            FatChart.update();
+        }
+
+        function changeWeekFat(direction) {
+            currentDateFat.setDate(currentDateFat.getDate() + (direction * 7));
+            updateFatChart();
+        }
+
+        const ctxFat = document.getElementById('FatChart').getContext('2d');
+        const FatChart = new Chart(ctxFat, {
+            type: 'bar',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'ไขมัน (g)',
+                    backgroundColor: '#EF476F',
+                    data: [],
+                    borderRadius: 10,
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+        updateFatChart();
+
+        // ------------------------- โซเดียม -------------------------
+        async function getSodiumForWeek(startDate) {
+            const endDate = new Date(startDate);
+            endDate.setDate(startDate.getDate() + 6);
+            const formattedStartDate = startDate.toISOString().split('T')[0];
+            const formattedEndDate = endDate.toISOString().split('T')[0];
+
+            try {
+                const response = await fetch('https://flask-api-1-e2yx.onrender.com/get_sodium_for_week', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, startDate: formattedStartDate, endDate: formattedEndDate })
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    return data.sodiumData;
+                }
+            } catch (err) {
+                console.error("Error fetching sodium:", err);
+            }
+            return {};
+        }
+
+        async function updateSodiumChart() {
+            const days = getWeekDays(currentDateSodium);
+            const labels = days.map(formatThaiDate);
+            const sodiumData = await getSodiumForWeek(days[0]);
+            const data = days.map(day => {
+                const key = day.toISOString().split('T')[0];
+                return sodiumData[key]?.sodium || 0;
+            });
+
+            document.getElementById('week-label-sodium').textContent = `${labels[0]} - ${labels[6]}`;
+            SodiumChart.data.labels = labels;
+            SodiumChart.data.datasets[0].data = data;
+            SodiumChart.update();
+        }
+
+        function changeWeekSodium(direction) {
+            currentDateSodium.setDate(currentDateSodium.getDate() + (direction * 7));
+            updateSodiumChart();
+        }
+
+        const ctxSodium = document.getElementById('SodiumChart').getContext('2d');
+        const SodiumChart = new Chart(ctxSodium, {
+            type: 'bar',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'โซเดียม (mg)',
+                    backgroundColor: '#118AB2',
+                    data: [],
+                    borderRadius: 10,
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+        updateSodiumChart();
+
     </script>
 
 </body>

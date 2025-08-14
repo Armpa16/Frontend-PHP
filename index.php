@@ -79,7 +79,7 @@ $conn->close();
             <i class="fas fa-bars"></i>
         </button>
         <!-- เเถบบาร์ด้านข้าง -->
-        <div class="bar flex-column p-0" style="width: 310px; height: 1150px;">
+        <div class="bar flex-column p-0" style="width: 310px; height: auto;">
             <div class="text-center py-4">
                 <i class="fa-solid fa-circle-user fs-1"></i>
                 <div class="fs-4 mt-2" style="font-size: 25px; font-weight:bold;"><?php echo htmlspecialchars($_SESSION['username']);?></div>

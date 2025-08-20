@@ -592,7 +592,6 @@ $conn->close();
                                             <i class="fa-solid fa-fire"></i> ${food.calories} kcal | <i class="fa-solid fa-drumstick-bite"></i> ${food.protein} g | <i class="fa-solid fa-bread-slice"></i> ${food.carbohydrate} g 
                                         </p>
                                         <div class="food-actions">
-                                            <span class="food-name">${food.food_name}</span>
                                             <span class="food-amount">${food.amount || '1 จาน'}</span>
                                         </div>
                                     </div>
@@ -775,7 +774,6 @@ $conn->close();
                                                     <i class="fa-solid fa-fire"></i> ${food.calories} kcal | <i class="fa-solid fa-drumstick-bite"></i> ${food.protein} g | <i class="fa-solid fa-bread-slice"></i> ${food.carbohydrate} g
                                                 </p>
                                                 <div class="food-actions">
-                                                    <span class="food-name">${food.food_name}</span>
                                                     <span class="food-amount">${food.amount || '1 จาน'}</span>
                                                 </div>
                                             </div>
